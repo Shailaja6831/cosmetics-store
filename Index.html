@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-Commerce Product Showcase</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">Beautiva</div>
+    <nav class="navbar">
+      <a href="#">Home</a>
+      <a href="#">Products</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search products..." />
+      <button id="searchBtn">Search</button>
+    </div>
+  </header>
+  <main>
+    <section class="product-section">
+      <h2 class="section-title">Featured Products</h2>
+      <div class="filters">
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="fashion">Fashion</option>
+          <option value="cosmetics">Cosmetics</option>
+        </select>
+
+        <select id="sortFilter">
+          <option value="default">Sort by</option>
+          <option value="lowToHigh">Price: Low to High</option>
+          <option value="highToLow">Price: High to Low</option>
+        </select>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="product-grid" id="productGrid">
+        <!-- Products will be injected here via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 MyShop. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyShop - Cosmetics</title>
+  <style>
+    /* --- Global Styles --- */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fdf6f9;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(90deg, #ff7eb3, #ff758c);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    nav button {
+      background: white;
+      border: none;
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    nav button:hover { background: #ffe0eb; transform: scale(1.05); }
+
+    .container { padding: 2rem; }
+
+    /* --- Product Cards --- */
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card img { width: 100%; border-radius: 10px; }
+    .card h3 { margin: 0.5rem 0; }
+    .card button {
+      background: #ff7eb3;
+      border: none;
+      color: white;
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      margin: 0.3rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .card button:hover { background: #ff5584; }
+
+    /* --- Modal (Cart, Checkout, Login) --- */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-content h2, .modal-content h3 { margin-top: 0; text-align: center; color: #ff5584; }
+    .modal-content input {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.7rem;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .modal-content button {
+      width: 100%;
+      background: linear-gradient(90deg, #ff7eb3, #ff758c);
+      border: none;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.3s;
+    }
+    .modal-content button:hover { background: linear-gradient(90deg, #ff5584, #ff3366); }
+    .close-btn {
+      background: #eee;
+      border: none;
+      padding: 0.4rem 0.7rem;
+      border-radius: 50%;
+      cursor: pointer;
+      float: right;
+      font-weight: bold;
+    }
+    .close-btn:hover { background: #ddd; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MyShop</h1>
+    <nav>
+      <button onclick="openModal('loginModal')">Login</button>
+      <button onclick="openModal('cartModal')">Cart 🛒 (<span id="cartCount">0</span>)</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Featured Cosmetics</h2>
+    <div class="products" id="productList"></div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('cartModal')">×</button>
+      <h2>Your Cart</h2>
+      <div id="cartItems"></div>
+      <p style="text-align:center; font-weight:bold;">Total: ₹<span id="cartTotal">0</span></p>
+      <button onclick="checkout()">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="modal" id="checkoutModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('checkoutModal')">×</button>
+      <h2>Checkout</h2>
+      <input type="text" placeholder="Full Name" required>
+      <input type="text" placeholder="Address" required>
+      <input type="text" placeholder="City" required>
+      <input type="text" placeholder="Pincode" required>
+
+      <h3>Payment Details</h3>
+      <input type="text" placeholder="Cardholder Name" required>
+      <input type="text" placeholder="Card Number" maxlength="16" required>
+      <div style="display:flex; gap:10px;">
+        <input type="text" placeholder="MM/YY" maxlength="5" required>
+        <input type="password" placeholder="CVV" maxlength="3" required>
+      </div>
+
+      <button onclick="placeOrder()">Pay Now</button>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('loginModal')">×</button>
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Enter Username">
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Sample Products ---
+    const products = [
+      {id:1, name:"Luminous Glow Face Serum", price:899, img:"https://via.placeholder.com/200x150?text=Serum"},
+      {id:2, name:"Rose Mist Toner", price:499, img:"https://via.placeholder.com/200x150?text=Toner"},
+      {id:3, name:"Silk Touch Face Cream", price:699, img:"https://via.placeholder.com/200x150?text=Cream"}
+    ];
+
+    let cart = [];
+
+    const productList = document.getElementById('productList');
+    products.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <img src="${p.img}" alt="${p.name}">
+        <h3>${p.name}</h3>
+        <p>₹${p.price}</p>
+        <button onclick="addToCart(${p.id})">Add to Cart</button>
+      `;
+      productList.appendChild(div);
+    });
+
+    function addToCart(id){
+      const item = products.find(p => p.id===id);
+      cart.push(item);
+      updateCart();
+    }
+
+    function updateCart(){
+      document.getElementById('cartCount').textContent = cart.length;
+      const cartItems = document.getElementById('cartItems');
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price;
+        const div = document.createElement('div');
+        div.style.padding = "5px 0";
+        div.textContent = item.name + " - ₹" + item.price;
+        cartItems.appendChild(div);
+      });
+      document.getElementById('cartTotal').textContent = total;
+    }
+
+    function checkout(){
+      closeModal('cartModal');
+      openModal('checkoutModal');
+    }
+
+    function placeOrder(){
+      alert("✅ Payment Successful! Your order has been placed.");
+      cart = [];
+      updateCart();
+      closeModal('checkoutModal');
+    }
+
+    function login(){
+      const username = document.getElementById('username').value;
+      if(username){
+        alert(`Welcome, ${username}!`);
+        closeModal('loginModal');
+      } else {
+        alert("Please enter username");
+      }
+    }
+
+    function openModal(id){ document.getElementById(id).style.display='flex'; }
+    function closeModal(id){ document.getElementById(id).style.display='none'; }
+    
+  </script>
+</body>
+</html>
+</body>
+</html>
